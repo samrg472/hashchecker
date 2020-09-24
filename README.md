@@ -1,3 +1,3 @@
-# hashchecker
+# RRU
 
-A utility to generate or verify checksums on the command-line.
+"Random Rust Utilities" that may be of service for certain tasks.
