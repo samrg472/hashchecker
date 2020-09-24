@@ -46,7 +46,7 @@ impl ArchiveOrgConf {
             let mut new_name = match file.get_child("title") {
                 Some(new_name) => new_name.value().unwrap(),
                 None => {
-                    self.rename(&old_path, None);
+                    latest_report += self.rename(&old_path, None);
                     continue;
                 }
             };
@@ -104,8 +104,13 @@ impl ArchiveOrgConf {
                 }
             }
             None => {
-                report.untouched += 1;
-                self.write_quick_report(Color::Green, "UNTOUCHED", old_name, None);
+                if old_path.is_file() {
+                    report.untouched += 1;
+                    self.write_quick_report(Color::Green, "UNTOUCHED", old_name, None);
+                } else {
+                    report.missing += 1;
+                    self.write_quick_report(Color::Red, "MISSING", old_name, None);
+                }
             }
         }
 
