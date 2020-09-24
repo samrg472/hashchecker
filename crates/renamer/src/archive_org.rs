@@ -1,12 +1,12 @@
 use crate::Report;
 use rru_common::XmlDoc;
 use std::{
-    path::{Path, PathBuf},
+    fs,
     io::{Read, Write},
+    mem,
+    path::{Path, PathBuf},
     sync::Arc,
     sync::Mutex,
-    fs,
-    mem,
 };
 use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 
@@ -83,8 +83,8 @@ impl ArchiveOrgConf {
         let old_name = pretty_path_name(old_path);
         match new_path {
             Some(new_path) => {
+                let new_name = pretty_path_name(new_path);
                 if old_path.is_file() {
-                    let new_name = pretty_path_name(new_path);
                     if new_path.is_file() {
                         panic!(
                             "Cannot rename {} as the new name already exists at {}",
@@ -94,32 +94,37 @@ impl ArchiveOrgConf {
 
                     fs::rename(old_path, new_path).unwrap();
                     report.renamed += 1;
-                    self.write_quick_report(Color::Green, "RENAMED", old_name);
+                    self.write_quick_report(Color::Green, "RENAMED", old_name, Some(&new_name));
                 } else if new_path.is_file() {
                     report.untouched += 1;
-                    self.write_quick_report(Color::Green, "UNTOUCHED", old_name);
+                    self.write_quick_report(Color::Green, "UNTOUCHED", new_name, None);
                 } else {
                     report.missing += 1;
-                    self.write_quick_report(Color::Red, "MISSING", old_name);
+                    self.write_quick_report(Color::Red, "MISSING", old_name, None);
                 }
             }
             None => {
                 report.untouched += 1;
-                self.write_quick_report(Color::Green, "UNTOUCHED", old_name);
+                self.write_quick_report(Color::Green, "UNTOUCHED", old_name, None);
             }
         }
 
         report
     }
 
-    fn write_quick_report(&self, status_color: Color, status: &str, content: &str) {
+    fn write_quick_report(&self, status_color: Color, status: &str, old: &str, new: Option<&str>) {
         let mut stdout = self.stdout.lock().unwrap();
         stdout
             .set_color(ColorSpec::new().set_fg(Some(status_color)))
             .unwrap();
         write!(stdout, "{}", status).unwrap();
         stdout.reset().unwrap();
-        writeln!(stdout, " ... {}", content).unwrap();
+        match new {
+            Some(new) => {
+                writeln!(stdout, " ... '{}' => '{}'", old, new).unwrap();
+            }
+            None => writeln!(stdout, " ... '{}'", old).unwrap(),
+        }
     }
 }
 
