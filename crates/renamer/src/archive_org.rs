@@ -100,7 +100,7 @@ impl ArchiveOrgConf {
                     self.write_quick_report(Color::Green, "UNTOUCHED", old_name);
                 } else {
                     report.missing += 1;
-                    self.write_quick_report(Color::Green, "MISSING", old_name);
+                    self.write_quick_report(Color::Red, "MISSING", old_name);
                 }
             }
             None => {
