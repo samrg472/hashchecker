@@ -26,11 +26,6 @@ async fn main() {
                             .takes_value(true)
                             .help("Path or URL to the archive.org files XML metadata"),
                     )
-                    .arg(
-                        Arg::with_name("rename_to_title")
-                            .long("rename-to-title")
-                            .help("Renames a file to the title specified in the metadata"),
-                    )
                     .arg(Arg::with_name("path").long("path").takes_value(true).help(
                         "Path of the files to test, defaults to the current working directory",
                     )),
