@@ -44,7 +44,7 @@ impl ArchiveOrgConf {
             let mut exp_digest = vec![0u8; exp_sha1.len() / 2];
             faster_hex::hex_decode(exp_sha1.as_bytes(), &mut exp_digest).unwrap();
             let file_path = Path::join(&self.files_path, name);
-            let report = self.check_file(name, file_path.clone(), exp_digest.clone());
+            let report = self.check_file(name, file_path, exp_digest.clone());
             latest_report += report;
         }
 
